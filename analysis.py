@@ -9,7 +9,7 @@ Created on Wed May 22 18:07:08 2019
 import math
 import pandas as pd
 import numpy as np
-from sklearn import preprocessing
+from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 
 data = pd.read_csv('alumnos.csv')
@@ -47,9 +47,9 @@ def calculateNewCentroid(dataCentroid):
     meanValues = dataCentroid.mean()
     return [meanValues[0],meanValues[1],meanValues[2]]
     
-def cluster2K(data):
-    centroidA = np.random.randint(0,15)
-    centroidB = np.random.randint(0,15)
+def cluster2K(data, grupo, x, y, z):
+    centroidA = np.random.randint(0,14)
+    centroidB = np.random.randint(0,14)
     centroidA = data.iloc[centroidA].values
     centroidB = data.iloc[centroidB].values
     
@@ -58,13 +58,33 @@ def cluster2K(data):
     print(centroidA)
     print("Centroid B")
     print(centroidB)
+    count = 0
     while True:
         for i in range(0,15):
             if calculateDistance(data.iloc[i].values, centroidA) > calculateDistance(data.iloc[i].values, centroidB):
                 data.loc[i,["Clase"]] = "B"
             else:
                 data.loc[i,["Clase"]] = "A"
-        print(data)
+        #print(data)
+        
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        
+        colors = {'A':'red', 'B':'blue'}
+        
+        ax.scatter(data[x], data[y], data[z], c=data['Clase'].apply(lambda x: colors[x]), marker='o')
+
+        ax.set_xlabel(x)
+        ax.set_ylabel(y)
+        ax.set_zlabel(z)
+        
+        fig1 = plt.gcf()
+        plt.show()
+        plt.draw()
+        fig1.savefig('grupo_' + str(grupo) + '/2k-' + str(count) + '.png', dpi=100)
+        
+        count += 1
+                
         newCentroidA = calculateNewCentroid(data.iloc[:][data.Clase == "A"])
         newCentroidB = calculateNewCentroid(data.iloc[:][data.Clase == "B"])
         print(newCentroidA)
@@ -76,10 +96,10 @@ def cluster2K(data):
             centroidB = newCentroidB
     print("End of 2K centroids")        
     
-def cluster3K(data):
-    centroidA = np.random.randint(0,15)
-    centroidB = np.random.randint(0,15)
-    centroidC = np.random.randint(0,15)
+def cluster3K(data, grupo, x, y, z):
+    centroidA = np.random.randint(0,14)
+    centroidB = np.random.randint(0,14)
+    centroidC = np.random.randint(0,14)
     centroidA = data.iloc[centroidA].values
     centroidB = data.iloc[centroidB].values
     centroidC = data.iloc[centroidC].values
@@ -91,6 +111,7 @@ def cluster3K(data):
     print(centroidB)
     print("Centroid C")
     print(centroidC)
+    count = 0
     while True:
         for i in range(0,15):
             distanceA = calculateDistance(data.iloc[i].values, centroidA)
@@ -103,7 +124,26 @@ def cluster3K(data):
                 data.loc[i,["Clase"]] = "B"
             elif min(distances) == distanceC:
                 data.loc[i,["Clase"]] = "C"
-        print(data)
+        # print(data)
+        
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        
+        colors = {'A':'red', 'B':'blue', 'C':'green'}
+        
+        ax.scatter(data[x], data[y], data[z], c=data['Clase'].apply(lambda x: colors[x]), marker='o')
+
+        ax.set_xlabel(x)
+        ax.set_ylabel(y)
+        ax.set_zlabel(z)
+        
+        fig1 = plt.gcf()
+        plt.show()
+        plt.draw()
+        fig1.savefig('grupo_' + str(grupo) + '/3k-' + str(count) + '.png', dpi=100)
+        
+        count += 1
+        
         newCentroidA = calculateNewCentroid(data.iloc[:][data.Clase == "A"])
         newCentroidB = calculateNewCentroid(data.iloc[:][data.Clase == "B"])
         newCentroidC = calculateNewCentroid(data.iloc[:][data.Clase == "C"])
@@ -118,5 +158,11 @@ def cluster3K(data):
             centroidC = newCentroidC
     print("End of 3K centroids")
 
-cluster2K(group_1)
-cluster3K(group_1)
+cluster2K(group_1, 1, 'Estatura', 'peso', 'calzado')
+cluster3K(group_1, 1, 'Estatura', 'peso', 'calzado')
+
+cluster2K(group_2, 2, 'promedio', 'materiasRepite', 'dinero')
+cluster3K(group_2, 2, 'promedio', 'materiasRepite', 'dinero')
+
+cluster2K(group_3, 3, 'nHermanos', 'dinero', 'edad')
+cluster3K(group_3, 3, 'nHermanos', 'dinero', 'edad')
